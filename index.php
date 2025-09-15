@@ -3,13 +3,15 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 session_start();
-include($_SERVER['DOCUMENT_ROOT']."/classes/dbConfig.php");
-include($_SERVER['DOCUMENT_ROOT']."/classes/classUser.php" );
+include_once($_SERVER['DOCUMENT_ROOT']."/classes/dbConfig.php");
+include_once($_SERVER['DOCUMENT_ROOT']."/classes/classUser.php" );
+include_once($_SERVER['DOCUMENT_ROOT']."/classes/classOrder.php");
 global $dbConf;
 include_once __DIR__ . "/lib/glassapi.php";
 $api = new \GlassApi\GlassApi();
 // Инициализация модулей
 $error = false;
+
 if (!empty($_GET['action'])){
     $action = $_GET['action'];
     $file = __DIR__."/lib/actions/$action.php";
@@ -29,8 +31,9 @@ if ($api->checkAuthorization() && !$error) {
     $actionDo = new $actionClass();
     $nextOffset = "";
     $nextLimit = "";
+
     //Обработка пагинации
-    if(isset($_GET['limit']) && (int)$_GET['limit'] > 100)
+    if(isset($_GET['limit']) && (int)$_GET['limit'] > 0)
     {
         $actionDo->limit = (int)$_GET['limit'];
     }
@@ -42,11 +45,33 @@ if ($api->checkAuthorization() && !$error) {
         $nextLimit = "&limit=$actionDo->limit";
         $nextOffset="&offset=".($actionDo->offset+$actionDo->limit);
     }
+
+    // Обработка фильтров
+
+    if(isset($actionDo->filters) && is_array($actionDo->filters)) {
+        $arrFilters = [
+            'date_from',
+            'date_to',
+            'create_date_to',
+            'create_date_from',
+            'orderId'
+        ];
+        $filter = [];
+
+        foreach ($_GET as $key=>$getParam)
+        {
+            if(in_array($key,$arrFilters))
+            {
+                $filter[$key] = $getParam;
+            }
+        }
+        $actionDo->filters = $filter;
+    }
     $result = $actionDo->executeAction();
     $result['next_page'] = "?action=".$action.$nextOffset.$nextLimit;
     $api->sendJsonAnswer($result);
 } else {
-    echo 'Error';
+    echo 'Error authorization';
 }
 session_abort();
 die();
