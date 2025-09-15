@@ -13,18 +13,17 @@ class getProducts extends GlassApi
         $brandService = new BrandService();
         $items = $goodsService->getByParent([
                 'parent' => null,
-                'sort' => [
-                    [
-                        "column"=>"id",
-                        "direction" => "asc"
-                    ]
-                ],
+//                'sort' => [
+//                    [
+//                        "column"=>"id",
+//                        "direction" => "asc"
+//                    ]
+//                ],
                 'search' => "",
                 'limit' => $this->limit,
                 'offset' => $this->offset
             ]
         )->get();
-
         // Типы товаров
         $arrProductTypes = [];
         foreach ($goodsTypesService->getTree([],true) as $type){
