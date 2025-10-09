@@ -49,8 +49,8 @@ class getProducts extends GlassApi
                 ],
                 'manufacturer' => $item-> fk_manufacturer,
                 'brand' => [
-                    "id" => $item->fk_brand,
-                    "name" => $arrBrands[$item->fk_brand]
+                    "id" => !empty($item->fk_brand)?$item->fk_brand:"",
+                    "name" => !empty($item->fk_brand)?$arrBrands[$item->fk_brand]:""
                 ],
                 'full_name' => $item-> full_name,
                 'short_name' => $item-> short_name,
