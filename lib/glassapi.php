@@ -22,7 +22,8 @@ class GlassApi
 
     public function checkAuthorization()
     {
-        $token = isset($this->requestHeaders['token'])?$this->requestHeaders['token']:$this->requestHeaders['Token'];
+        $tokenIsset = (key_exists('token',$this->requestHeaders) || key_exists('Token',$this->requestHeaders));
+        if ($tokenIsset) $token = isset($this->requestHeaders['token'])?$this->requestHeaders['token']:$this->requestHeaders['Token'];
         if (empty($token)) return false;
         return ($token == $this->token);
     }
