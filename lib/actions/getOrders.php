@@ -52,28 +52,36 @@ class getOrders extends GlassApi
 
             // Корзина
             $basket = $COrder->GetOrderBasket($order['orderId']);
-            foreach($basket as $item)
-            {
-                if(!$item['canceled'])//Если резервы не отменены
+            if (is_array($basket) && count($basket) > 0) {
+                foreach($basket as $item)
                 {
-                    $item['productData'] = str_replace(array("\r\n", "\r", "\n"), ' ', $item['productData']);
-                    $data_u = preg_replace_callback(
-                        '!s:(\d+):"(.*?)";!',
-                        function($m) {
-                            return 's:'.strlen($m[2]).':"'.$m[2].'";';
-                        },
-                        $item['productData']);
-                    $data = unserialize( $data_u );
+                    if(!$item['canceled'])//Если резервы не отменены
+                    {
+                        $item['productData'] = str_replace(array("\r\n", "\r", "\n"), ' ', $item['productData']);
+                        $data_u = preg_replace_callback(
+                            '!s:(\d+):"(.*?)";!',
+                            function($m) {
+                                return 's:'.strlen($m[2]).':"'.$m[2].'";';
+                            },
+                            $item['productData']);
+                        try {
+                            $data = unserialize($data_u);
 
-                    //$data = unserialize($item['productData']);
-                    $position = $item['codes'].", ".$data['name'].", ".$data['brand'].", ".$item['buy_price'];
-                    $arrOrder['basket'][] = [
-                        'position' => $position,
-                        'codes' => $item['codes'],
-                        'name' => $data['name'],
-                        'brand' => $data['brand'],
-                        'buy_price' => $item['buy_price']
-                    ];
+                            if(!empty($data['name']) && !empty($data['brand']) && !empty($item['codes']) && !empty($item['buy_price'])) {
+                                $position = $item['codes'].", ".$data['name'].", ".$data['brand'].", ".$item['buy_price'];
+                                $arrOrder['basket'][] = [
+                                    'position' => $position,
+                                    'codes' => $item['codes'],
+                                    'name' => $data['name'],
+                                    'brand' => $data['brand'],
+                                    'buy_price' => $item['buy_price']
+                                ];
+                            }
+                        } catch (Exception $e) {
+                            echo 'PHP перехватил исключение: ',  $e->getMessage(), "\n";
+                            echo json_encode($item);
+                        }
+                    }
                 }
             }
             $arrOrders[]=$arrOrder;
