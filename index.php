@@ -6,6 +6,8 @@ session_start();
 include_once($_SERVER['DOCUMENT_ROOT']."/classes/dbConfig.php");
 include_once($_SERVER['DOCUMENT_ROOT']."/classes/classUser.php" );
 include_once($_SERVER['DOCUMENT_ROOT']."/classes/classOrder.php");
+// custom Classes extend Base Classes
+include_once __DIR__."/lib/classes/COrderApi.php";
 global $dbConf;
 include_once __DIR__ . "/lib/glassapi.php";
 $api = new \GlassApi\GlassApi();
@@ -57,7 +59,6 @@ if ($api->checkAuthorization() && !$error) {
             'orderId'
         ];
         $filter = [];
-
         foreach ($_GET as $key=>$getParam)
         {
             if(in_array($key,$arrFilters))
@@ -65,6 +66,9 @@ if ($api->checkAuthorization() && !$error) {
                 $filter[$key] = $getParam;
             }
         }
+        // Fix если не задан какой либо параметр по дате
+        if(isset($filter['create_date_to']) && !isset($filter['create_date_from'])) $filter['create_date_from'] = $filter['create_date_to'];
+        if(isset($filter['create_date_from']) && !isset($filter['create_date_to'])) $filter['create_date_to'] = $filter['create_date_from'];
         $actionDo->filters = $filter;
     }
     $result = $actionDo->executeAction();
