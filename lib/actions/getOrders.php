@@ -1,13 +1,13 @@
 <?php
 namespace GlassApi;
-use COrder;
+use COrderApi;
 class getOrders extends GlassApi
 {
     public $filters = [];
     public $options  = [];
     public $sort = [];
     public function executeAction() {
-        $COrder = new COrder();
+        $COrder = new COrderApi();
         $statuses = $this->prepareStatuses($COrder->GetStatuses());
         $orders = $COrder->newGetOrders($this->filters, $this->options, $this->sort);
 
@@ -58,14 +58,15 @@ class getOrders extends GlassApi
                     if(!$item['canceled'])//Если резервы не отменены
                     {
                         $item['productData'] = str_replace(array("\r\n", "\r", "\n"), ' ', $item['productData']);
-                        $data_u = preg_replace_callback(
-                            '!s:(\d+):"(.*?)";!',
-                            function($m) {
-                                return 's:'.strlen($m[2]).':"'.$m[2].'";';
-                            },
-                            $item['productData']);
+//                        $data_u = preg_replace_callback(
+//                            '!s:(\d+):"(.*?)";!',
+//                            function($m) {
+//                                return 's:'.strlen($m[2]).':"'.$m[2].'";';
+//                            },
+//                            $item['productData']);
                         try {
-                            $data = unserialize($data_u);
+                            //$data = unserialize($data_u);
+                            $data = unserialize($item['productData']);
 
                             if(!empty($data['name']) && !empty($data['brand']) && !empty($item['codes']) && !empty($item['buy_price'])) {
                                 $position = $item['codes'].", ".$data['name'].", ".$data['brand'].", ".$item['buy_price'];
