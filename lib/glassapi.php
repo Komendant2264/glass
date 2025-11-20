@@ -8,7 +8,7 @@ class GlassApi
     public $context;
     public $requestHeaders;
     public $requestBody;
-    public $debug_mode = true;
+    public $debug_mode = false;
 
     public function __construct()
     {
@@ -22,8 +22,7 @@ class GlassApi
 
     public function checkAuthorization()
     {
-        $tokenIsset = (key_exists('token',$this->requestHeaders) || key_exists('Token',$this->requestHeaders));
-        if ($tokenIsset) $token = isset($this->requestHeaders['token'])?$this->requestHeaders['token']:$this->requestHeaders['Token'];
+        $token = isset($this->requestHeaders['token'])?$this->requestHeaders['token']:$this->requestHeaders['Token'];
         if (empty($token)) return false;
         return ($token == $this->token);
     }

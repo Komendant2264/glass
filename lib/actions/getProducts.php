@@ -9,7 +9,7 @@ class getProducts extends GlassApi
     public $offset = 0;
     public function executeAction(){
         $goodsTypesService = new GoodsTypesService();
-        $goodsService = new GoodsService();
+        $goodsService = new GoodsService(['without_search' => true]);
         $brandService = new BrandService();
         $items = $goodsService->getByParent([
                 'parent' => null,
