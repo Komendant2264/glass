@@ -8,7 +8,7 @@ class GlassApi
     public $context;
     public $requestHeaders;
     public $requestBody;
-    public $debug_mode = false;
+    public $debug_mode = true;
 
     public function __construct()
     {
@@ -17,12 +17,13 @@ class GlassApi
         $this->requestHeaders = getallheaders();
         $requestBody = file_get_contents('php://input');
         $this->requestBody = json_decode($requestBody, TRUE);
-        if(isset($this->requestBody['debug_mode'])) $this->debugMode = $this->requestBody['debug_mode'];
+        if(isset($this->requestBody['debug_mode']) && true == $this->requestBody['debug_mode']) $this->debug_mode = true;
     }
 
     public function checkAuthorization()
     {
-        $token = isset($this->requestHeaders['token'])?$this->requestHeaders['token']:$this->requestHeaders['Token'];
+        $tokenIsset = (key_exists('token',$this->requestHeaders) || key_exists('Token',$this->requestHeaders));
+        if ($tokenIsset) $token = isset($this->requestHeaders['token'])?$this->requestHeaders['token']:$this->requestHeaders['Token'];
         if (empty($token)) return false;
         return ($token == $this->token);
     }
@@ -37,7 +38,7 @@ class GlassApi
 
     public function sendJsonError(array $arError, string $status = "401")
     {
-        if ($this->debugMode) {
+        if ($this->debug_mode) {
             \Bitrix\Main\Diag\Debug::dumpToFile(
                 [
                     'time' => ConvertTimeStamp(time(), "FULL", "ru"),

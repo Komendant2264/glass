@@ -32,7 +32,6 @@ class COrderApi extends COrder
            ($api ? 'AND (type_reserve=1 OR (type_reserve=2 AND assoc_reserve=0) )':'')." ".
            (!$cancel_items ? 'AND canceled = 0' : '')."
 		order by `cart`.`assoc_reserve` DESC, `cart`.`id`";
-
        $basket = $this->db->query($query)->fetchAll();
        return $basket;
    }

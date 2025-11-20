@@ -70,6 +70,7 @@ class getOrders extends GlassApi
                             if(!empty($data['name']) && !empty($data['brand']) && !empty($item['codes']) && !empty($item['buy_price'])) {
                                 $position = $item['codes'].", ".$data['name'].", ".$data['brand'].", ".$item['buy_price'];
                                 $arrOrder['basket'][] = [
+                                    'productId' => $item['productId'],
                                     'position' => $position,
                                     'codes' => $item['codes'],
                                     'name' => $data['name'],

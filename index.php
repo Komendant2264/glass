@@ -27,6 +27,7 @@ if (!empty($_GET['action'])){
 }
 
 if ($api->checkAuthorization() && !$error) {
+    if(isset($_GET['debug_mode']) && true == $_GET['debug_mode']) $api->debug_mode = true;
     $actionClass = "\\GlassApi\\".$action;
     $actionDo = new $actionClass();
     $nextOffset = "";
